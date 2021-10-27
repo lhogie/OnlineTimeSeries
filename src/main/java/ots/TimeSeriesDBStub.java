@@ -28,7 +28,7 @@ public class TimeSeriesDBStub extends ServiceStub {
 	}
 
 	public void sendBuffer() throws Throwable {
-		localService.trigger(to, TimeSeriesDB.addPoint, true, buf).returnQ.collect().throwAnyError();
+		localService.exec(to, TimeSeriesDB.addPoint, 1, 0, buf);
 		buf.clear();
 	}
 
@@ -37,38 +37,37 @@ public class TimeSeriesDBStub extends ServiceStub {
 		s.metricNames = metricNames;
 		s.id = "subscribe_" + ThreadLocalRandom.current().nextLong();
 		localService.registerOperation(s.id, (msg, returns) -> newImage.accept((byte[]) msg.content));
-		localService.trigger(to, TimeSeriesDB.getPlot_subscribe, true, s).returnQ.collect().throwAnyError();
+		localService.exec(to, TimeSeriesDB.getPlot_subscribe, 1, 1, s);
 		return s.id;
 	}
 
-	public void subscribe(String id, Consumer<byte[]> newImage) throws Throwable {
-		localService.trigger(to, TimeSeriesDB.getPlot_unsubscribe, true, id).returnQ.collect().throwAnyError();
+	public void unsubscribe(String id, Consumer<byte[]> newImage) throws Throwable {
+		localService.exec(to, TimeSeriesDB.getPlot_unsubscribe, 1, 0, id);
 	}
 
 	public void createFigure(String metricName) throws Throwable {
-		localService.trigger(to, TimeSeriesDB.createFigure, true, metricName).returnQ.collect().throwAnyError();
+		localService.exec(to, TimeSeriesDB.createFigure, 1, 0, metricName);
 	}
 
 	public void setFigureColor(String metricName, Color c) throws Throwable {
-		localService.trigger(to, TimeSeriesDB.setFigureColor, true, new OperationParameterList(metricName, c)).returnQ.collect()
-				.throwAnyError();
+		localService.start(to, TimeSeriesDB.setFigureColor, true, new OperationParameterList(metricName, c)).returnQ
+				.collect().throwAnyError();
 	}
 
 	public byte[] getPlot(Set<String> metricNames, String title, String format) throws Throwable {
-		return (byte[]) localService.trigger(to, TimeSeriesDB.getPlot, true,
-				new OperationParameterList(metricNames, title, format)).returnQ.get();
+		return (byte[]) localService.exec(to, TimeSeriesDB.getPlot, 1, 0, metricNames, title, format).get(0);
 	}
 
 	public byte[] getPlot_subscribe(Set<String> metricNames, String title, String format) throws Throwable {
-		return (byte[]) localService.trigger(to, TimeSeriesDB.getPlot, true,
+		return (byte[]) localService.start(to, TimeSeriesDB.getPlot, true,
 				new OperationParameterList(metricNames, title, format)).returnQ.get();
 	}
 
 	public Set<String> metricNames() throws Throwable {
-		return (Set<String>) localService.trigger(to, TimeSeriesDB.getMetricNames, true, new OperationParameterList()).returnQ.get();
+		return (Set<String>) localService.exec(to, TimeSeriesDB.getMetricNames, 1, 1).get(0);
 	}
 
-	public Figure download(String figureName) throws Throwable {
-		return (Figure) localService.trigger(to, TimeSeriesDB.retrieveFigure, true, figureName).returnQ.get();
+	public Set<Figure> download(String figureName) throws Throwable {
+		return (Set<Figure>) localService.exec(to, TimeSeriesDB.retrieveFigure, 1, 1, figureName).get(0);
 	}
 }

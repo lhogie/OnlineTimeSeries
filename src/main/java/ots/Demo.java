@@ -15,6 +15,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 import idawi.ComponentAddress;
 import idawi.ComponentDescriptor;
+import idawi.OperationParameterList;
 import idawi.Service;
 import idawi.ServiceAddress;
 import idawi.service.DeployerService;
@@ -27,16 +28,15 @@ public class Demo {
 	public static void main(String[] args) throws Throwable {
 		System.out.println("start");
 
-		new Service() {
+		var s = new Service() {
 			@Override
 			public void run() throws Throwable {
 				// start a new JVM to host the time series DB
-				ComponentDescriptor serverDescriptor = ComponentDescriptor
-						.fromCDL("name=db / udp_port=56933 / ssh=musclotte.inria.fr");
+				ComponentDescriptor serverDescriptor = ComponentDescriptor.fromCDL("name=db / udp_port=56933");
 				var server = new TimeSeriesDBStub(this, new ComponentAddress(Set.of(serverDescriptor)));
 				lookupService(DeployerService.class).deploy(Set.of(serverDescriptor), true, 15, false, null, null);
-				trigger(new ServiceAddress(Set.of(serverDescriptor), ServiceManager.class), ServiceManager.start, true,
-						TimeSeriesDB.class);
+				start(new ServiceAddress(Set.of(serverDescriptor), ServiceManager.class), ServiceManager.start, true,
+						new OperationParameterList(TimeSeriesDB.class));
 				lookupService(RESTService.class).startHTTPServer();
 
 				// creates the figure that will be fed
@@ -45,6 +45,7 @@ public class Demo {
 
 				// runs the simulation
 				for (int step = 0;; ++step) {
+					System.out.println(step);
 					// computes something
 					Threads.sleepMs(100);
 					System.out.println("sending point");
@@ -53,6 +54,10 @@ public class Demo {
 				}
 			}
 		};
+
+		s.run();
+
+		Threads.sleepForever();
 	}
 
 	private static void startGUI(TimeSeriesDBStub localDB, ComponentDescriptor remoteDB) {
@@ -96,6 +101,8 @@ public class Demo {
 
 		Threads.newThread_loop(() -> {
 			try {
+				var fig = client.download("some metric");
+				System.out.println(fig);
 				byte[] png = client.getPlot(Set.of("some metric"), "my first plot", "png");
 
 				if (png != null) {
