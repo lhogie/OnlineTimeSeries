@@ -28,7 +28,6 @@ import toools.thread.Threads;
 import xycharter.Figure;
 import xycharter.PNGPlotter;
 import xycharter.Plot;
-import xycharter.render.ConnectedLineFigureRenderer;
 
 /**
  * Sends an empty message on a queue that is created specifically for the peer
@@ -47,7 +46,8 @@ public class TimeSeriesDB extends Service {
 	public static OperationID addPoint;
 
 	@IdawiOperation
-	public void add(PointBuffer buf) {
+	public void addPoint(PointBuffer buf) {
+
 		for (Figure f : buf.values()) {
 			Figure a = name2figure.get(f.name);
 
@@ -155,11 +155,15 @@ public class TimeSeriesDB extends Service {
 
 	public static OperationID createFigure;
 
+	public void saySomething() {
+		System.out.println("Hello, this is non-static method.");
+	}
+
 	@IdawiOperation
 	synchronized public void createFigure(String name) {
 		Figure f = new Figure();
 		f.setName(name);
-		//f.addRenderer(new ConnectedLineFigureRenderer());
+		// f.addRenderer(new ConnectedLineFigureRenderer());
 		name2figure.put(name, f);
 	}
 
@@ -173,8 +177,7 @@ public class TimeSeriesDB extends Service {
 	public static OperationID filter;
 
 	@IdawiOperation
-	synchronized public Set<Figure> filter(Message msg, Consumer<Object> returns) {
-		Filter filter = (Filter) msg.content;
+	synchronized public Set<Figure> filter(Filter filter) {
 		Set<Figure> r = new HashSet<>();
 
 		for (Figure f : name2figure.values()) {
@@ -201,38 +204,45 @@ public class TimeSeriesDB extends Service {
 	public static OperationID getPlot;
 
 	@IdawiOperation
-	public void getPlot(Set<String> metricNames, String title, String format, Consumer<Object> returns) {
+	public byte[] getPlot(Set<String> metricNames, String title, String format) {
 		Plot plot = new Plot();
 		metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
 		plot.getSpace().getLegend().setText(title);
 		byte[] rawData = getPlotRawData(plot, format);
-		returns.accept(rawData);
+		return rawData;
 	}
 
 	private final LongSet subscriptions = new LongOpenHashSet();
 
 	public static OperationID getPlot_subscribe;
 
+	public static class PSD {
+		Set<String> metricNames; String title; String format;
+	}
+	
 	@IdawiOperation
-	public void getPlot_subscribe(Set<String> metricNames, String title, String format, Consumer<Object> returns) {
+	public void getPlot_subscribe(MessageQueue in) {
+		var msg = in.get_blocking();
+		var parms = (PSD) msg.content;
+	
 		Plot plot = new Plot();
-		metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
-		plot.getSpace().getLegend().setText(title);
+		parms.metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
+		plot.getSpace().getLegend().setText(parms.title);
 		long id = ThreadLocalRandom.current().nextLong();
 		subscriptions.add(id);
-		returns.accept(id);
+		send(id, msg.requester);
 		int periodMs = 1000;
 		Threads.newThread_loop_periodic(periodMs, () -> subscriptions.contains(id), () -> {
-			byte[] rawData = getPlotRawData(plot, format);
-			returns.accept(rawData);
+			byte[] rawData = getPlotRawData(plot, parms.format);
+			send(rawData, msg.requester);
 		});
 	}
 
 	public static OperationID getPlot_unsubscribe;
 
 	@IdawiOperation
-	private void getPlot_unsubscribe(Message msg, Consumer<Object> returns) {
-		subscriptions.remove(((Long) msg.content).longValue());
+	private void getPlot_unsubscribe(long id) {
+		subscriptions.remove(id);
 	}
 
 	private byte[] getPlotRawData(Plot plot, String format) {
