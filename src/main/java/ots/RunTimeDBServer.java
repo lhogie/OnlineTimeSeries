@@ -1,6 +1,7 @@
 package ots;
 
 import java.io.StringReader;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,51 +14,39 @@ import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.w3c.dom.svg.SVGDocument;
 
-import idawi.ComponentAddress;
+import idawi.Component;
 import idawi.ComponentDescriptor;
-import idawi.OperationParameterList;
-import idawi.Service;
-import idawi.ServiceAddress;
-import idawi.service.DeployerService;
 import idawi.service.ServiceManager;
 import idawi.service.rest.RESTService;
 import toools.gui.Utilities;
 import toools.thread.Threads;
 
-public class Demo {
+public class RunTimeDBServer {
 	public static void main(String[] args) throws Throwable {
 		System.out.println("start");
+		var c = new Component();
+		// starts the TimeSeriesDB service
+		c.lookupService(ServiceManager.class).start(TimeSeriesDB.class);
+		var tsd = c.lookupService(TimeSeriesDB.class);
 
-		var s = new Service() {
-			@Override
-			public void run() throws Throwable {
-				// start a new JVM to host the time series DB
-				ComponentDescriptor serverDescriptor = ComponentDescriptor.fromCDL("name=db / udp_port=56933");
-				var server = new TimeSeriesDBStub(this, new ComponentAddress(Set.of(serverDescriptor)));
-				lookupService(DeployerService.class).deploy(Set.of(serverDescriptor), true, 15, false, null, null);
-				start(new ServiceAddress(Set.of(serverDescriptor), ServiceManager.class), ServiceManager.start, true,
-						new OperationParameterList(TimeSeriesDB.class));
-				lookupService(RESTService.class).startHTTPServer();
+		int port = 8084;
+		 c.lookupService(RESTService.class).startHTTPServer(port);
+			System.out.println("URL: http://localhost:" + port + "/api/" + c.friendlyName);
+			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
 
-				// creates the figure that will be fed
-				server.createFigure("some metric");
-				startGUI2(server, serverDescriptor);
+		// creates the figure that will be fed
+		tsd.createFigure("testMetric");
+		// startGUI2(server, serverDescriptor);
+		var r = new Random();
 
-				// runs the simulation
-				for (int step = 0;; ++step) {
-					System.out.println(step);
-					// computes something
-					Threads.sleepMs(100);
-					System.out.println("sending point");
-					// send point
-					server.registerPoint("some metric", step, Math.random(), 1);
-				}
-			}
-		};
-
-		s.run();
-
-		Threads.sleepForever();
+		// runs the simulation
+		for (double step = 0;; step += r.nextDouble()) {
+			// computes something
+			Threads.sleepMs(1000);
+			System.out.println("sending point");
+			// send point
+			tsd.addPoint("testMetric", step, Double.longBitsToDouble(r.nextLong()));
+		}
 	}
 
 	private static void startGUI(TimeSeriesDBStub localDB, ComponentDescriptor remoteDB) {

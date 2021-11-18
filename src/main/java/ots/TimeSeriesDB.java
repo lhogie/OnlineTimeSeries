@@ -10,13 +10,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import idawi.AsMethodOperation.OperationID;
 import idawi.Component;
 import idawi.IdawiOperation;
-import idawi.Message;
 import idawi.MessageQueue;
 import idawi.Service;
 import idawi.Streams;
@@ -46,7 +44,19 @@ public class TimeSeriesDB extends Service {
 	public static OperationID addPoint;
 
 	@IdawiOperation
-	public void addPoint(PointBuffer buf) {
+	public void addPoint(String metric, double x, double y) {
+		Figure a = name2figure.get(metric);
+
+		if (a == null)
+			throw new Error("figure not found: " + metric);
+
+		a.addPoint(x, y);
+	}
+
+	public static OperationID addPoints;
+
+	@IdawiOperation
+	public void addPoints(PointBuffer buf) {
 
 		for (Figure f : buf.values()) {
 			Figure a = name2figure.get(f.name);
@@ -56,6 +66,11 @@ public class TimeSeriesDB extends Service {
 
 			a.addPoints(f);
 		}
+	}
+
+	@Override
+	public String getDescription() {
+		return "stores (name, x, y) triplets";
 	}
 
 	public static OperationID store;
@@ -128,10 +143,10 @@ public class TimeSeriesDB extends Service {
 		return baseDir.listRegularFiles().stream().map(f -> f.getName()).collect(Collectors.toSet());
 	}
 
-	public static OperationID retrieveFigure;
+	public static OperationID retrieveAllPoints;
 
 	@IdawiOperation
-	public Set<Figure> retrieveFigure(String re) {
+	public Set<Figure> retrieveAllPoints(String re) {
 		Set<Figure> r = new HashSet<>();
 
 		for (var e : name2figure.entrySet()) {
@@ -153,24 +168,21 @@ public class TimeSeriesDB extends Service {
 		Streams.split(new PipedInputStream(pos), 1000, b -> send(b, in.get_blocking().requester));
 	}
 
-	public static OperationID createFigure;
+	public static OperationID registerMetric;
 
-	public void saySomething() {
-		System.out.println("Hello, this is non-static method.");
-	}
 
 	@IdawiOperation
-	synchronized public void createFigure(String name) {
+	synchronized public void registerMetric(String name) {
 		Figure f = new Figure();
 		f.setName(name);
 		// f.addRenderer(new ConnectedLineFigureRenderer());
 		name2figure.put(name, f);
 	}
 
-	public static OperationID setFigureColor;
+	public static OperationID setMetricColor;
 
 	@IdawiOperation
-	synchronized public void setFigureColor(String figName, Color color) {
+	synchronized public void setMetricColor(String figName, Color color) {
 		name2figure.get(figName).setColor(color);
 	}
 
@@ -217,14 +229,16 @@ public class TimeSeriesDB extends Service {
 	public static OperationID getPlot_subscribe;
 
 	public static class PSD {
-		Set<String> metricNames; String title; String format;
+		Set<String> metricNames;
+		String title;
+		String format;
 	}
-	
+
 	@IdawiOperation
 	public void getPlot_subscribe(MessageQueue in) {
 		var msg = in.get_blocking();
 		var parms = (PSD) msg.content;
-	
+
 		Plot plot = new Plot();
 		parms.metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
 		plot.getSpace().getLegend().setText(parms.title);
