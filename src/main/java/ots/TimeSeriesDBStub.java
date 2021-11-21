@@ -46,11 +46,11 @@ public class TimeSeriesDBStub extends ServiceStub {
 	}
 
 	public void createFigure(String metricName) throws Throwable {
-		localService.exec(to, TimeSeriesDB.createFigure, 1, 0, metricName);
+		localService.exec(to, TimeSeriesDB.registerMetric, 1, 0, metricName);
 	}
 
 	public void setFigureColor(String metricName, Color c) throws Throwable {
-		localService.start(to, TimeSeriesDB.setFigureColor, true, new OperationParameterList(metricName, c)).returnQ
+		localService.start(to, TimeSeriesDB.setMetricColor, true, new OperationParameterList(metricName, c)).returnQ
 				.collect().throwAnyError();
 	}
 

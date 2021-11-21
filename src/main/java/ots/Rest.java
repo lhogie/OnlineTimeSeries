@@ -49,7 +49,7 @@ public class Rest {
 				buf.add(metricName, Date.time(), Utils.loadRatio());
 			}
 
-			timeDB.addPoint(buf);
+			timeDB.addPoints(buf);
 			buf.clear();
 		}
 	}
