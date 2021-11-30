@@ -32,7 +32,7 @@ public class RunTimeDBServer {
 		int port = 8084;
 		 c.lookupService(RESTService.class).startHTTPServer(port);
 			System.out.println("URL: http://localhost:" + port + "/api/" + c.friendlyName);
-//			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
+			System.out.println("Website URL: http://localhost:" + port + "/web/ots/display/try.html");
 
 		// creates the figure that will be fed
 		tsd.registerMetric("testMetric");
