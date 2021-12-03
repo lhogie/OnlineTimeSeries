@@ -16,7 +16,7 @@
     });
 })*/
 
-var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getNbPoints/testMetric";
+var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
 var request = new XMLHttpRequest();
 
@@ -32,15 +32,58 @@ request.onload = function() {
     console.log("data connection");
     var answer = request.response;
     console.log(answer);
-    toHeader(answer);
+    setInterval(function(){
+      var li = document.createElement("h3");
+      var name= document.createElement('p');
+      var lastX = document.createElement('p');
+      var lastY = document.createElement('p');
+
+      var ul = document.getElementById("metricList");
+      name.textContent = 'result :' + answer['results'][0][0][0]['name'];
+      lastX.textContent = 'result :' + answer['results'][0][0][0]['lastX'];
+      lastY.textContent = 'result :' + answer['results'][0][0][0]['lastY'];
+
+      li.appendChild(name);
+      li.appendChild(lastX);
+      li.appendChild(lastY);
+
+      ul.appendChild(li)
+
+    },1001); // toHeader sera executer a apres 1,001 seconde 
+    //setTimeout(toHeader(answer), 20000); // toHeader(answer) sera exécutée au bout de 2 secondes
+    //toHeader(answer);
     
   }
 
   function toHeader(jsonObj) {
-    var myH1 = document.createElement('h1');
-    myH1.textContent = 'result :' + jsonObj['result'][0];
-    body.appendChild(myH1);
+    var li = document.createElement("h3");
+    var name= document.createElement('p');
+    var lastX = document.createElement('p');
+    var lastY = document.createElement('p');
+
+    var ul = document.getElementById("metricList");
+    name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
+    lastX.textContent = 'result :' + jsonObj['results'][0][0][0]['lastX'];
+    lastY.textContent = 'result :' + jsonObj['results'][0][0][0]['lastY'];
+
+    li.appendChild(name);
+    li.appendChild(lastX);
+    li.appendChild(lastY);
+
+    ul.appendChild(li)
 
   }
+
+
+  $(function() {
+    $('#aperçu').click(function() {
+      var donnees = '[\'results\'][0][0][0]'
+        $.getJSON(requestURL, function(donnees) {
+        $('#r').html('<p><b>Nom</b> : ' + donnees.lastX + '</p>');
+        $('#r').append('<p><b>Age</b> : ' + donnees.lastY + '</p>');
+        $('#r').append('<p><b>Ville</b> : ' + donnees.name + '</p>');
+        });
+    });
+});
 
  
