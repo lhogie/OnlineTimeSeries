@@ -15,8 +15,59 @@
         ul.appendChild(h4);
     });
 })*/
+setInterval(function(){
+  var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
-var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
+  var request = new XMLHttpRequest();
+  
+  request.open('GET', requestURL);
+  
+  request.responseType = 'json';
+  //request.Origin = "try.html";
+  console.log("data connection");
+  
+  request.send();
+  
+  request.onload = function() {
+      console.log("data connection");
+      var answer = request.response;
+      console.log(answer);
+
+// remplissage du tableau et representation des informations 
+
+  //var li = document.createElement("h3");*
+  var td1 = document.createElement('td');
+  var td2 = document.createElement('td');
+  //var name= document.createElement('p');
+  var lastX = document.createElement('p');
+  var lastY = document.createElement('p');
+
+
+
+  var table = document.getElementById("inforRepresentation");
+  //var tbody = document.getElementById("metricInformations")
+  var tr = document.createElement('tr');
+  //name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
+  lastX.textContent =  answer['results'][0][0][0]['lastX'];
+  lastY.textContent =  answer['results'][0][0][0]['lastY'];
+
+  //li.appendChild(name);
+  td1.appendChild(lastX);
+  td2.appendChild(lastY);
+
+  tr.appendChild(td1);
+  
+  tr.appendChild(td2);
+  //tbody.appendChild(tr);
+  console.log(tr);
+  table.appendChild(tr);
+
+  console.log(table)
+ // toHeader sera executer a apres 1,001 seconde 
+  }
+  
+},1000);
+/*var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
 var request = new XMLHttpRequest();
 
@@ -49,30 +100,69 @@ request.onload = function() {
 
       ul.appendChild(li)
 
-    },1001); // toHeader sera executer a apres 1,001 seconde 
+    },10001); // toHeader sera executer a apres 1,001 seconde 
     //setTimeout(toHeader(answer), 20000); // toHeader(answer) sera exécutée au bout de 2 secondes
     //toHeader(answer);
     
+
+// remplissage du tableau et representation des informations 
+setInterval(function(){
+  //var li = document.createElement("h3");*
+  var td1 = document.createElement('td');
+  var td2 = document.createElement('td');
+  //var name= document.createElement('p');
+  var lastX = document.createElement('p');
+  var lastY = document.createElement('p');
+
+
+
+  var table = document.getElementById("inforRepresentation");
+  //var tbody = document.getElementById("metricInformations")
+  var tr = document.createElement('tr');
+  //name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
+  lastX.textContent = 'result :' + answer['results'][0][0][0]['lastX'];
+  lastY.textContent = 'result :' + answer['results'][0][0][0]['lastY'];
+
+  //li.appendChild(name);
+  td1.appendChild(lastX);
+  td2.appendChild(lastY);
+
+  tr.appendChild(td1);
+  
+  tr.appendChild(td2);
+  //tbody.appendChild(tr);
+  console.log(tr);
+  table.appendChild(tr);
+
+  console.log(table)
+},1001); // toHeader sera executer a apres 1,001 seconde 
   }
 
-  function toHeader(jsonObj) {
-    var li = document.createElement("h3");
-    var name= document.createElement('p');
+
+  /*function toHeader(jsonObj) {
+    //var li = document.createElement("h3");*
+    var td1 = document.createElement('td');
+    var td2 = document.createElement('td');
+    //var name= document.createElement('p');
     var lastX = document.createElement('p');
     var lastY = document.createElement('p');
 
-    var ul = document.getElementById("metricList");
-    name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
+    var tr = document.createElement('tr');
+    var tbody = document.getElementById("metricInformations")
+    //name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
     lastX.textContent = 'result :' + jsonObj['results'][0][0][0]['lastX'];
     lastY.textContent = 'result :' + jsonObj['results'][0][0][0]['lastY'];
 
-    li.appendChild(name);
-    li.appendChild(lastX);
-    li.appendChild(lastY);
+    //li.appendChild(name);
+    td1.appendChild(lastX);
+    td2.appendChild(lastY);
 
-    ul.appendChild(li)
+    tr.appendChild(td1);
+    tr.appendChild(td2)
 
-  }
+    tbody.appendChild(tr)
+
+  }*/
 
 
   $(function() {
