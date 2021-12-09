@@ -15,6 +15,29 @@
         ul.appendChild(h4);
     });
 })*/
+
+var trace1 = {
+
+  x: [],
+
+  y: [0],
+
+  mode: 'line'
+
+};
+var data = [ trace1 ];
+
+
+var layout = {
+
+title:'Line and Scatter Plot'
+
+};
+
+Plotly.newPlot('chart', layout);
+
+var first = true ;
+
 setInterval(function(){
   var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
@@ -35,37 +58,58 @@ setInterval(function(){
 
 // remplissage du tableau et representation des informations 
 
-  //var li = document.createElement("h3");*
   var td1 = document.createElement('td');
   var td2 = document.createElement('td');
-  //var name= document.createElement('p');
+
   var lastX = document.createElement('p');
   var lastY = document.createElement('p');
 
 
 
   var table = document.getElementById("inforRepresentation");
-  //var tbody = document.getElementById("metricInformations")
+  
   var tr = document.createElement('tr');
   //name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
   lastX.textContent =  answer['results'][0][0][0]['lastX'];
   lastY.textContent =  answer['results'][0][0][0]['lastY'];
 
-  //li.appendChild(name);
+  
   td1.appendChild(lastX);
   td2.appendChild(lastY);
 
   tr.appendChild(td1);
   
   tr.appendChild(td2);
-  //tbody.appendChild(tr);
-  console.log(tr);
+  
+  //console.log(tr);
   table.appendChild(tr);
 
-  console.log(table)
- // toHeader sera executer a apres 1,001 seconde 
+  //console.log(table)
+  
+  // graphe introduction
+  let trace2 = {
+
+    x: [answer['results'][0][0][0]['lastX']],
+  
+    y: [answer['results'][0][0][0]['lastY']],
+  
+    mode: 'line'
+  
+  };
+   data = [ trace2 ];
+  if(window.first){
+  Plotly.newPlot('chart', data,layout);
+  window.first = false ;
+  console.log(first);
+  }
+  console.log(first);
+
+    Plotly.extendTraces('chart',{ x: [[answer['results'][0][0][0]['lastX']]], y: [[answer['results'][0][0][0]['lastY']]]}, [0]);
+
   }
   
+  
+
 },1000);
 /*var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
@@ -177,3 +221,64 @@ setInterval(function(){
 });
 
  
+
+// Introduction du graphe 
+/*
+function getData() {
+  return Math.random(10);
+}
+
+
+var trace1 = {
+
+  x: answer['results'][0][0][0]['lastX'],
+
+  y: answer['results'][0][0][0]['lastY'],
+
+  mode: 'markers'
+
+};
+
+
+var trace2 = {
+
+  // x: [2, 3, 4, 5],
+
+  y: [getData()],
+
+  mode: 'lines'
+
+};
+
+
+var trace3 = {
+
+  //x: [1, 2, 3, 4],
+
+  y: [getData()],
+
+  mode: 'lines+markers'
+
+};
+
+
+//var data = [ trace1, trace2, trace3 ];
+var data = [ trace1 ];
+
+
+var layout = {
+
+  title:'Line and Scatter Plot'
+
+};
+
+Plotly.newPlot('chart', data, layout);
+
+setInterval(function(){
+  //Plotly.extendTraces('chart',data, [0]);
+  Plotly.extendTraces('chart',{ y:[[getData()]]}, [0]);
+  //Plotly.extendTraces('chart',{ y:[[getData()]]}, [1]);
+  //Plotly.extendTraces('chart',{ y:[[getData()]]}, [2]);
+},1000);*/
+
+
