@@ -30,8 +30,15 @@ var data = [ trace1 ];
 
 var layout = {
 
-title:'Line and Scatter Plot'
-
+title:'Line and Scatter Plot',
+yaxis: {
+  type: 'log',
+  autorange: true
+},
+  width: 1600,  // or any new width
+  height: 1000,  // " "
+  //xaxis: {range: [-1, 1]},
+  yaxis: {range: [-1, 1]}
 };
 
 Plotly.newPlot('chart', layout);
@@ -96,20 +103,19 @@ setInterval(function(){
     mode: 'line'
   
   };
+    
+  
    data = [ trace2 ];
+
   if(window.first){
-  Plotly.newPlot('chart', data,layout);
+  Plotly.newPlot('chart', data, layout);
   window.first = false ;
-  console.log(first);
   }
-  console.log(first);
 
     Plotly.extendTraces('chart',{ x: [[answer['results'][0][0][0]['lastX']]], y: [[answer['results'][0][0][0]['lastY']]]}, [0]);
 
   }
   
-  
-
 },1000);
 /*var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 

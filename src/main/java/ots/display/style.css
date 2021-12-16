@@ -8,3 +8,15 @@ tfoot {
     background-color: #333;
     color: #fff;
 }
+.navbar{
+    text-align: center;
+    background-color: aquamarine;
+    text-decoration-color: black;
+}
+.wrapper{
+    height: auto;
+    width: auto;
+    position: center;
+    padding-left: 10px;
+    padding-top: 20px;
+}
