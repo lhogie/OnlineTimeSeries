@@ -9,48 +9,33 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<div class="navbar"><span>Real-Time Chart with Plotly.js</span></div>
+
+<div class="navbar">
+    <span>Real-Time Chart with Plotly.js</span>
+</div>
+<div >
+    <table id="metrics">
+            <tr id="names">
+                <th>Metrics : </th>
+                <td>testmetrics</td>
+            </tr>
+    </table>
+</div>
+
 <div class="wrapper">
-<button onclick="drawGraphe()">Graphe</button>
-    <div id="chart"></div>
-    <script>
-        /*function getData() {
-            return Math.random();
-        }
-
-        Plotly.plot('chart',[{
-            y:[getData()],
-            type:'markers'
-        }]);
-
-        var cnt = 0;
-
-        setInterval(function(){
-
-            Plotly.extendTraces('chart',{ y:[[getData()]]}, [0]);
-
-            cnt++;
-            /*if(cnt > 500) {
-                Plotly.relayout('chart',{
-                    xaxis: {
-                        range: [cnt-500,cnt]
-                    }
-                });
-            }
-        },1000);*/
-
+    <div id="chart">
         
-
-    </script>
-
+    </div>
 </div>
-<div id="DataExtracted">
-    <p id=list>List of available points</p>
-    <ul id="metricList">
-        <script src="script.js"></script>
-    </ul>
+<div id="buttonwrapper">
+
+    <button>Refresh</button>
+    
+    <button>Extract</button>
+    
+    <button onclick="drawGraphe()">Superpose</button>
+
+   
 </div>
-
-
-</body>
+<script src="script.js"></script>
 </html>

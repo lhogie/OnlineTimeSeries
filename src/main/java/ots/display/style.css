@@ -12,11 +12,30 @@ tfoot {
     text-align: center;
     background-color: aquamarine;
     text-decoration-color: black;
+    font-size:xx-large;
+    margin-bottom: 3%;
 }
 .wrapper{
-    height: auto;
-    width: auto;
+    height: 700px;
+    width: 1000px;
     position: center;
     padding-left: 10px;
     padding-top: 20px;
+}
+.metrics{
+    position: relative;
+}
+.buttonwrapper{
+    height: 100px;
+    width: max-content;
+}
+button{
+    background-color: aquamarine;
+    border-radius: 20%;
+    height: 40px;
+    width: 160px;
+    margin: right 20%;;
+    text-align: center;
+    text-decoration-color: black;
+    
 }

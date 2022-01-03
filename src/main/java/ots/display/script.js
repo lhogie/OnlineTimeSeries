@@ -42,31 +42,32 @@ setInterval(function(){
   request.open('GET', requestURL1);
   
   request.responseType = 'json';
-  //request.Origin = "try.html";
-  //console.log("data connection");
   
   request.send();
   
   request.onload = function() {
-      //console.log("data connection");
-      var answer = request.response;
-      //console.log(answer);
+      
+  var answer = request.response;
 
 // remplissage du tableau et representation des informations 
 
-  var td1 = document.createElement('td');
-  var td2 = document.createElement('td');
+//var table = document.getElementsById("metrics");
 
-  var lastX = document.createElement('p');
-  var lastY = document.createElement('p');
-
-
-  //name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
-  lastX.textContent =  answer['results'][0][0][0]['lastX'];
-  lastY.textContent =  answer['results'][0][0][0]['lastY'];
-
+//var tr = document.getElementsById("names");
   
-  
+  var td = document.createElement('td');
+
+  var name = document.createElement('p');
+
+
+  name.textContent = answer['results'][0][0][0]['name'];
+  //lastX.textContent =  answer['results'][0][0][0]['lastX'];
+  //lastY.textContent =  answer['results'][0][0][0]['lastY'];
+console.log(name.textContent);
+
+  td.appendChild(name);
+
+    
   // graphe introduction
   let trace2 = {
 
@@ -106,7 +107,7 @@ function drawGraphe(){
     
     request.responseType = 'json';
     //request.Origin = "try.html";
-    console.log("data connection");
+    //console.log("data connection");
     
     request.send();
     
