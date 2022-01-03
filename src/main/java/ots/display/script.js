@@ -1,20 +1,3 @@
-/*$.getJSON("http://localhost:8084/api/c0/ots.TimeSeriesDB/getNbPoints/testMetric", function (json) {
-    json['results'][0].forEach((graph) => {
-        var ul = document.getElementById("metricList");
-        //ul.style.paddingLeft = "4em";
-        var list = document.getElementById("list");
-        list.style.paddingLeft = "1em";
-        list.style.paddingTop = ".8em";
-        list.style.fontSize = "22px";
-        var li = document.createElement("h4");
-        var element = document.createElement('a');
-        element.text = graph
-        //element.href = "graph.html?gid=" + graph
-        element.style.fontSize = "22px";
-        h4.appendChild( element );
-        ul.appendChild(h4);
-    });
-})*/
 
 var trace1 = {
 
@@ -25,8 +8,8 @@ var trace1 = {
   mode: 'line'
 
 };
-var data = [ trace1 ];
 
+var data = [ trace1 ];
 
 var layout = {
 
@@ -36,7 +19,7 @@ yaxis: {
   autorange: true
 },
   width: 1600,  // or any new width
-  height: 1000,  // " "
+  height: 500,  // " "
   //xaxis: {range: [-1, 1]},
   yaxis: {range: [-1, 1]}
 };
@@ -44,24 +27,30 @@ yaxis: {
 Plotly.newPlot('chart', layout);
 
 var first = true ;
+var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/";
+
+console.log(requestURL);
+var requestURL1 = requestURL + "getMetricInfo";
 
 setInterval(function(){
-  var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
+  
+  console.log(requestURL1);
+
 
   var request = new XMLHttpRequest();
   
-  request.open('GET', requestURL);
+  request.open('GET', requestURL1);
   
   request.responseType = 'json';
   //request.Origin = "try.html";
-  console.log("data connection");
+  //console.log("data connection");
   
   request.send();
   
   request.onload = function() {
-      console.log("data connection");
+      //console.log("data connection");
       var answer = request.response;
-      console.log(answer);
+      //console.log(answer);
 
 // remplissage du tableau et representation des informations 
 
@@ -72,27 +61,60 @@ setInterval(function(){
   var lastY = document.createElement('p');
 
 
-
-  var table = document.getElementById("inforRepresentation");
-  
-  var tr = document.createElement('tr');
   //name.textContent = 'result :' + jsonObj['results'][0][0][0]['name'];
   lastX.textContent =  answer['results'][0][0][0]['lastX'];
   lastY.textContent =  answer['results'][0][0][0]['lastY'];
 
   
-  td1.appendChild(lastX);
-  td2.appendChild(lastY);
+  
+  // graphe introduction
+  let trace2 = {
 
-  tr.appendChild(td1);
+    x: [answer['results'][0][0][0]['lastX']],
   
-  tr.appendChild(td2);
+    y: [answer['results'][0][0][0]['lastY']],
   
-  //console.log(tr);
-  table.appendChild(tr);
+    mode: 'line'
+  
+  }; 
+   /*data = [ trace2 ];
 
-  //console.log(table)
+  if(window.first){
+  Plotly.newPlot('chart', data, layout);
+  window.first = false ;
+  }
+
+    Plotly.extendTraces('chart',{ x: [[answer['results'][0][0][0]['lastX']]], y: [[answer['results'][0][0][0]['lastY']]]}, [0]);
+*/
+  }
   
+},1000);
+
+
+
+function drawGraphe(){
+  setInterval(function(){
+  
+    var x = document.getElementById("chart");
+    x.style.display="block";
+
+    var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
+  
+    var request = new XMLHttpRequest();
+    
+    request.open('GET', requestURL);
+    
+    request.responseType = 'json';
+    //request.Origin = "try.html";
+    console.log("data connection");
+    
+    request.send();
+    
+    request.onload = function() {
+        //console.log("data connection");
+        var answer = request.response;
+        //console.log(answer);
+
   // graphe introduction
   let trace2 = {
 
@@ -117,6 +139,17 @@ setInterval(function(){
   }
   
 },1000);
+  
+}
+function myFunction() {
+  var x = document.getElementById("chart");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+
 /*var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
 var request = new XMLHttpRequest();
@@ -214,17 +247,6 @@ setInterval(function(){
 
   }*/
 
-
-  $(function() {
-    $('#aperçu').click(function() {
-      var donnees = '[\'results\'][0][0][0]'
-        $.getJSON(requestURL, function(donnees) {
-        $('#r').html('<p><b>Nom</b> : ' + donnees.lastX + '</p>');
-        $('#r').append('<p><b>Age</b> : ' + donnees.lastY + '</p>');
-        $('#r').append('<p><b>Ville</b> : ' + donnees.name + '</p>');
-        });
-    });
-});
 
  
 

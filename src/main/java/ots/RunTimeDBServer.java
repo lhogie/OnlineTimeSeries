@@ -45,7 +45,8 @@ public class RunTimeDBServer {
 			Threads.sleepMs(1000);
 			System.out.println("sending point");
 			// send point
-			tsd.addPoint("testMetric", step, Double.longBitsToDouble(r.nextLong()));
+			//tsd.addPoint("testMetric", step, Double.longBitsToDouble(r.nextLong()));
+			tsd.addPoint("testMetric", step, r.nextDouble());
 		}
 	}
 
