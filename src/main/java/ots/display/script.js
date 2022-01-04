@@ -28,16 +28,43 @@ Plotly.newPlot('chart', layout);
 
 var first = true ;
 var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/";
+var request = new XMLHttpRequest();
 
 console.log(requestURL);
 var requestURL1 = requestURL + "getMetricInfo";
 
+request.open('GET', requestURL1);
+// remplissage du tableau et representation des informations 
+
+
+var tr = document.createElement('tr');
+var td = document.createElement('td');
+var metricname = document.createElement('p');
+
+var table = document.getElementById("inforRepresentation");
+
+request.responseType = 'json';
+  
+request.send();
+
+request.onload = function() {
+
+var answer = request.response;
+
+metricname.textContent = answer['results'][0][0][0]['name'];
+td.appendChild(metricname);
+tr.appendChild(td);
+table.appendChild(tr);
+
+
+}
+
+
+
+
 setInterval(function(){
   
   console.log(requestURL1);
-
-
-  var request = new XMLHttpRequest();
   
   request.open('GET', requestURL1);
   
@@ -49,23 +76,9 @@ setInterval(function(){
       
   var answer = request.response;
 
-// remplissage du tableau et representation des informations 
 
-//var table = document.getElementsById("metrics");
-
-//var tr = document.getElementsById("names");
-  
-  var td = document.createElement('td');
-
-  var name = document.createElement('p');
-
-
-  name.textContent = answer['results'][0][0][0]['name'];
   //lastX.textContent =  answer['results'][0][0][0]['lastX'];
   //lastY.textContent =  answer['results'][0][0][0]['lastY'];
-console.log(name.textContent);
-
-  td.appendChild(name);
 
     
   // graphe introduction
