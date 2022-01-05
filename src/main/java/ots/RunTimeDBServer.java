@@ -37,6 +37,7 @@ public class RunTimeDBServer {
 		// creates the figure that will be fed
 		tsd.registerMetric("testMetric");
 		tsd.registerMetric("Metric1");
+		tsd.registerMetric("Metric2");
 
 		// startGUI2(server, serverDescriptor);
 		var r = new Random();
@@ -50,6 +51,7 @@ public class RunTimeDBServer {
 			//tsd.addPoint("testMetric", step, Double.longBitsToDouble(r.nextLong()));
 			tsd.addPoint("testMetric", step, r.nextDouble());
 			tsd.addPoint("Metric1", step, r.nextDouble());
+			tsd.addPoint("Metric2", step, r.nextDouble());
 		}
 	}
 

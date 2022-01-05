@@ -15,9 +15,13 @@
 </div>
 <div >
     <table id = "inforRepresentation">
-            <tr id = "tar" >
-                <th>Metrics : </th>
-            </tr>
+        <tr id = "numero">
+            <th>Identifiant :</th>  
+        </tr>
+
+        <tr id = "tar" >
+            <th>Metrics : </th>
+        </tr>
 
     </table>
 </div>
@@ -28,12 +32,16 @@
     </div>
 </div>
 <div id="buttonwrapper">
+    <label for="">Write the metric identifiant here please :</label>
+    <input type="text" id = "idm"><br>
 
-    <button>Refresh</button>
+    <button onclick="refresh()">Clear</button>
     
-    <button>Extract</button>
+    <button onclick="drawGrapheOfMultiple()">Draw chosen</button>
+
+    <button onclick="drawGrapheOfOne()">Draw</button>
     
-    <button onclick="drawGraphe()">Superpose</button>
+    <button onclick="drawGrapheOfTwo()">Superpose</button>
 
    
 </div>

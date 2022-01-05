@@ -36,8 +36,8 @@ var requestURL1 = requestURL + "getMetricInfo";
 request.open('GET', requestURL1);
 // remplissage du tableau et representation des informations 
 
-
-var tr = document.getElementById("tar");
+var tr = document.getElementById("numero");
+var tar = document.getElementById("tar");
 var table = document.getElementById("inforRepresentation");
 
 request.responseType = 'json';
@@ -50,27 +50,38 @@ var answer = request.response;
 
 for (i = 0; i<answer['results'][0][0].length;  i++){
   var td = document.createElement('td');
+  var tdnum = document.createElement('td');
+
   var metricname = document.createElement('p');
+  var metricidentifiant = document.createElement('p');
+
+  metricidentifiant.textContent = i+1;
   metricname.textContent = answer['results'][0][0][i]['name'];
+
   console.log(answer); 
-td.setAttribute('id',i);
+
+  td.setAttribute('id',i);
 // recuperation des identifiants des metrics . 
 td.setAttribute('onclick',"metricinformation()")
+tdnum.appendChild(metricidentifiant);
 td.appendChild(metricname);
-tr.appendChild(td);
+
+tr.appendChild(tdnum);
+tar.appendChild(td);
 
 }
-table.appendChild(tr);
+table.appendChild(tr)
+table.appendChild(tar);
 
 
 }
+var chart = document.getElementById("chart");
 
-
-function drawGraphe1(){
-  setInterval(function(){
+var refreshIntervalId;
+function drawGrapheOfOne(){
+  refreshIntervalId = setInterval(function(){
   
-    var x = document.getElementById("chart");
-    x.style.display="block";
+    chart.style.display="block";
 
     var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
   
@@ -118,24 +129,20 @@ function drawGraphe1(){
 
 
 function myFunction() {
-  var x = document.getElementById("chart");
-  if (x.style.display === "none") {
-    x.style.display = "block";
+  
+  if (chart.style.display === "none") {
+    chart.style.display = "block";
   } else {
-    x.style.display = "none";
+    chart.style.display = "none";
   }
 }
-/*
-function metricinformation(){
-var td = document.location.data();
-console.log(td);
-}*/
 
-function drawGraphe(){
-  setInterval(function(){
+
+function drawGrapheOfTwo(){
+   refreshIntervalId = setInterval(function(){
   
-    var x = document.getElementById("chart");
-    x.style.display="block";
+    
+    chart.style.display="block";
 
     var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
   
@@ -186,53 +193,58 @@ function drawGraphe(){
 
     Plotly.extendTraces('chart',{x: [[answer['results'][0][0][1]['lastX']]],y: [[answer['results'][0][0][1]['lastY']]]},[1]);
     Plotly.extendTraces('chart',{x: [[answer['results'][0][0][0]['lastX']]],y: [[answer['results'][0][0][0]['lastY']]]},[0]);
-   console.log("zebi");
   }
   
 },1000);
   
 }
 
+function drawGrapheOfMultiple(){
+  var compteur =1 ;
+  setInterval(function(){
   
+    
+    chart.style.display="block";
 
+    var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
+  
+    var request = new XMLHttpRequest();
+    
+    request.open('GET', requestURL);
+    
+    request.responseType = 'json';
+    //request.Origin = "try.html";
+    //console.log("data connection");
+    
+    request.send();
+    
+    request.onload = function() {
+        var answer = request.response;
+        var idmetric = document.getElementById('idm').value - 1;
+        if(compteur <=1){
+        data.push({x:[answer['results'][0][0][idmetric]['lastX']],y: [answer['results'][0][0][idmetric]['lastX']],mode :"line"});
+          compteur=compteur+1;
+      }
+   // affichage de notre plan de travail
+  if(window.first){
+  
+  Plotly.newPlot('chart', data , layout);
+  window.first = false ;
+  }
+  
+    Plotly.extendTraces('chart',{x: [[answer['results'][0][0][idmetric]['lastX']]],y: [[answer['results'][0][0][idmetric]['lastY']]]},[idmetric]);
+   
+  }
+  
+},1000);
+  
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function refresh(){
+  document.location.reload(true);
+  /*Plotly.deleteTraces(chart,0);
+  clearInterval(refreshIntervalId);*/
+}
 
 
 
