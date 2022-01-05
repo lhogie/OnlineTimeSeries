@@ -37,10 +37,7 @@ request.open('GET', requestURL1);
 // remplissage du tableau et representation des informations 
 
 
-var tr = document.createElement('tr');
-var td = document.createElement('td');
-var metricname = document.createElement('p');
-
+var tr = document.getElementById("tar");
 var table = document.getElementById("inforRepresentation");
 
 request.responseType = 'json';
@@ -51,62 +48,25 @@ request.onload = function() {
 
 var answer = request.response;
 
-metricname.textContent = answer['results'][0][0][0]['name'];
+for (i = 0; i<answer['results'][0][0].length;  i++){
+  var td = document.createElement('td');
+  var metricname = document.createElement('p');
+  metricname.textContent = answer['results'][0][0][i]['name'];
+  console.log(answer); 
+td.setAttribute('id',i);
+// recuperation des identifiants des metrics . 
+td.setAttribute('onclick',"metricinformation()")
 td.appendChild(metricname);
 tr.appendChild(td);
+
+}
 table.appendChild(tr);
 
 
 }
 
 
-
-
-setInterval(function(){
-  
-  console.log(requestURL1);
-  
-  request.open('GET', requestURL1);
-  
-  request.responseType = 'json';
-  
-  request.send();
-  
-  request.onload = function() {
-      
-  var answer = request.response;
-
-
-  //lastX.textContent =  answer['results'][0][0][0]['lastX'];
-  //lastY.textContent =  answer['results'][0][0][0]['lastY'];
-
-    
-  // graphe introduction
-  let trace2 = {
-
-    x: [answer['results'][0][0][0]['lastX']],
-  
-    y: [answer['results'][0][0][0]['lastY']],
-  
-    mode: 'line'
-  
-  }; 
-   /*data = [ trace2 ];
-
-  if(window.first){
-  Plotly.newPlot('chart', data, layout);
-  window.first = false ;
-  }
-
-    Plotly.extendTraces('chart',{ x: [[answer['results'][0][0][0]['lastX']]], y: [[answer['results'][0][0][0]['lastY']]]}, [0]);
-*/
-  }
-  
-},1000);
-
-
-
-function drawGraphe(){
+function drawGraphe1(){
   setInterval(function(){
   
     var x = document.getElementById("chart");
@@ -142,7 +102,7 @@ function drawGraphe(){
     
   
    data = [ trace2 ];
-
+   // affichage de notre plan de travail
   if(window.first){
   Plotly.newPlot('chart', data, layout);
   window.first = false ;
@@ -155,6 +115,8 @@ function drawGraphe(){
 },1000);
   
 }
+
+
 function myFunction() {
   var x = document.getElementById("chart");
   if (x.style.display === "none") {
@@ -163,6 +125,122 @@ function myFunction() {
     x.style.display = "none";
   }
 }
+/*
+function metricinformation(){
+var td = document.location.data();
+console.log(td);
+}*/
+
+function drawGraphe(){
+  setInterval(function(){
+  
+    var x = document.getElementById("chart");
+    x.style.display="block";
+
+    var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
+  
+    var request = new XMLHttpRequest();
+    
+    request.open('GET', requestURL);
+    
+    request.responseType = 'json';
+    //request.Origin = "try.html";
+    //console.log("data connection");
+    
+    request.send();
+    
+    request.onload = function() {
+        //console.log("data connection");
+        var answer = request.response;
+        //console.log(answer);
+
+  // graphe introduction
+  let trace2 = {
+
+    x: [answer['results'][0][0][0]['lastX']],
+  
+    y: [answer['results'][0][0][0]['lastY']],
+  
+    mode: 'line'
+  
+  };
+  let trace1 = {
+
+    x: [answer['results'][0][0][1]['lastX']],
+  
+    y: [answer['results'][0][0][1]['lastY']],
+  
+    mode: 'line'
+  
+  };
+    
+  
+   data = [ trace2 , trace1 ];
+   // affichage de notre plan de travail
+  if(window.first){
+  Plotly.newPlot('chart', data , layout);
+  window.first = false ;
+  }
+  //Plotly.extendTraces('chart',{y: [[[answer['results'][0][0][0]['lastX']]], [[answer['results'][0][0][1]['lastY']]]]}, [0,1]);
+  //Plotly.extendTraces('chart',{x: [[[answer['results'][0][0][0]['lastX']]],[[answer['results'][0][0][1]['lastX']]]],y: [[[answer['results'][0][0][0]['lastY']]],[[answer['results'][0][0][1]['lastY']]]]},[0,1]);
+
+    Plotly.extendTraces('chart',{x: [[answer['results'][0][0][1]['lastX']]],y: [[answer['results'][0][0][1]['lastY']]]},[1]);
+    Plotly.extendTraces('chart',{x: [[answer['results'][0][0][0]['lastX']]],y: [[answer['results'][0][0][0]['lastY']]]},[0]);
+   console.log("zebi");
+  }
+  
+},1000);
+  
+}
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*var requestURL = "http://localhost:8084/api/c0/ots.TimeSeriesDB/getMetricInfo";
 
