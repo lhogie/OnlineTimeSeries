@@ -1,0 +1,49 @@
+table,
+td {
+    border: 1px solid #333;
+}
+
+thead,
+tfoot {
+    background-color: #333;
+    color: #fff;
+}
+.navbar{
+    text-align: center;
+    background-color: aquamarine;
+    text-decoration-color: black;
+    font-size:xx-large;
+    margin-bottom: 3%;
+}
+.wrapper{
+    height: 650px;
+    width: 1000px;
+    position: center;
+    padding-left: 10px;
+    padding-top: 20px;
+}
+.metrics{
+    position: relative;
+}
+.buttonwrapper{
+    height: 100px;
+    width: max-content;
+}
+button{
+    background-color: aquamarine;
+    border-radius: 20%;
+    height: 40px;
+    width: 160px;
+    margin: right 20%;;
+    text-align: center;
+    text-decoration-color: black;
+    margin-top: 10px;
+    
+}
+label{
+    font-size: large;
+}
+input{
+    height: 25px;
+    width: 40;
+}

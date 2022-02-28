@@ -32,12 +32,24 @@ public class RunTimeDBServer {
 		var tsd = c.lookup(TimeSeriesDB.class);
 
 		int port = 8084;
+<<<<<<< HEAD
 		c.lookup(RESTService.class).startHTTPServer(port);
 		System.out.println("URL: http://localhost:" + port + "/api/" + c.name);
 //			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
 
 		// creates the figure that will be fed
 		tsd.lookup(registerMetric.class).f("testMetric");
+=======
+		 c.lookupService(RESTService.class).startHTTPServer(port);
+			System.out.println("URL: http://localhost:" + port + "/api/" + c.friendlyName);
+			System.out.println("Website URL: http://localhost:" + port + "/web/ots/display/index.html");
+
+		// creates the figure that will be fed
+		tsd.registerMetric("testMetric");
+		tsd.registerMetric("Metric1");
+		tsd.registerMetric("Metric2");
+
+>>>>>>> 46b72277ec6f43092e3029d31f34d5f6b0ca4d63
 		// startGUI2(server, serverDescriptor);
 		var r = new Random();
 
@@ -47,7 +59,14 @@ public class RunTimeDBServer {
 			Threads.sleepMs(1000);
 			System.out.println("sending point");
 			// send point
+<<<<<<< HEAD
 			tsd.lookup(addPoint.class).f("testMetric", step, Double.longBitsToDouble(r.nextLong()));
+=======
+			//tsd.addPoint("testMetric", step, Double.longBitsToDouble(r.nextLong()));
+			tsd.addPoint("testMetric", step, r.nextDouble());
+			tsd.addPoint("Metric1", step, r.nextDouble());
+			tsd.addPoint("Metric2", step, r.nextDouble());
+>>>>>>> 46b72277ec6f43092e3029d31f34d5f6b0ca4d63
 		}
 	}
 
