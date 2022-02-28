@@ -8,14 +8,13 @@ import it.unimi.dsi.fastutil.doubles.DoubleList;
 public class Metric {
 	public String name;
 	public Unit unit;
-	public void setName(String metricName) {
-		this.name = metricName;
-		
-	}
-	
 	DoubleList x = new DoubleArrayList(), y = new DoubleArrayList();
 	private Color color;
-	
+
+	public void setName(String metricName) {
+		this.name = metricName;
+	}
+
 	public void addPoint(double x, double y) {
 		this.x.add(x);
 		this.y.add(y);
@@ -37,6 +36,7 @@ public class Metric {
 	public double y(int i) {
 		return this.y(i);
 	}
+
 	public double x(int i) {
 		return this.x(i);
 	}

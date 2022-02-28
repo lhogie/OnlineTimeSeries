@@ -18,6 +18,8 @@ import idawi.Component;
 import idawi.ComponentDescriptor;
 import idawi.service.ServiceManager;
 import idawi.service.rest.RESTService;
+import ots.TimeSeriesDB.addPoint;
+import ots.TimeSeriesDB.registerMetric;
 import toools.gui.Utilities;
 import toools.thread.Threads;
 
@@ -26,16 +28,16 @@ public class RunTimeDBServer {
 		System.out.println("start");
 		var c = new Component();
 		// starts the TimeSeriesDB service
-		c.lookupService(ServiceManager.class).start(TimeSeriesDB.class);
-		var tsd = c.lookupService(TimeSeriesDB.class);
+		c.lookupO(ServiceManager.start.class).f(TimeSeriesDB.class);
+		var tsd = c.lookup(TimeSeriesDB.class);
 
 		int port = 8084;
-		 c.lookupService(RESTService.class).startHTTPServer(port);
-			System.out.println("URL: http://localhost:" + port + "/api/" + c.friendlyName);
+		c.lookup(RESTService.class).startHTTPServer(port);
+		System.out.println("URL: http://localhost:" + port + "/api/" + c.name);
 //			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
 
 		// creates the figure that will be fed
-		tsd.registerMetric("testMetric");
+		tsd.lookup(registerMetric.class).f("testMetric");
 		// startGUI2(server, serverDescriptor);
 		var r = new Random();
 
@@ -45,7 +47,7 @@ public class RunTimeDBServer {
 			Threads.sleepMs(1000);
 			System.out.println("sending point");
 			// send point
-			tsd.addPoint("testMetric", step, Double.longBitsToDouble(r.nextLong()));
+			tsd.lookup(addPoint.class).f("testMetric", step, Double.longBitsToDouble(r.nextLong()));
 		}
 	}
 
@@ -65,7 +67,6 @@ public class RunTimeDBServer {
 				SVGDocument document = factory.createSVGDocument(null, new StringReader(svg));
 				c.setSVGDocument(document);
 			} catch (Throwable e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

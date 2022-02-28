@@ -12,6 +12,9 @@ import idawi.net.LMI;
 import idawi.service.DeployerService;
 import idawi.service.ServiceManager;
 import idawi.service.rest.RESTService;
+import ots.TimeSeriesDB.addPoints;
+import ots.TimeSeriesDB.getMetricNames;
+import ots.TimeSeriesDB.registerMetric;
 import toools.thread.Threads;
 import toools.util.Date;
 
@@ -19,7 +22,7 @@ public class Rest {
 
 	public static void main(String[] args) throws Throwable {
 		Component a = new Component();
-		var deployer = a.lookupService(DeployerService.class);
+		var deployer = a.lookup(DeployerService.class);
 		var components = new ArrayList<>(deployer.deployInThisJVM(10, i -> "newc" + i, true, null));
 		System.out.println("connecting...");
 		LMI.gnp(components, 0.3);
@@ -27,11 +30,11 @@ public class Rest {
 		var s = new Service(a);
 
 		System.out.println("starting timeDB service");
-		a.lookupService(ServiceManager.class).ensureStarted(TimeSeriesDB.class);
-		var timeDB = a.lookupService(TimeSeriesDB.class);
+		a.lookup(ServiceManager.class).ensureStarted(TimeSeriesDB.class);
+		var timeDB = a.lookup(TimeSeriesDB.class);
 		System.out.println("starting Rest service");
-		a.lookupService(ServiceManager.class).ensureStarted(RESTService.class);
-		a.lookupService(RESTService.class).startHTTPServer();
+		a.lookup(ServiceManager.class).ensureStarted(RESTService.class);
+		a.lookup(RESTService.class).startHTTPServer();
 		var prng = new Random();
 		PointBuffer buf = new PointBuffer();
 		OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
@@ -40,16 +43,16 @@ public class Rest {
 			Threads.sleepMs(100);
 
 			for (var c : components) {
-				String metricName = c.descriptor().friendlyName + " load";
+				String metricName = c.descriptor().name + " load";
 
-				if (!timeDB.getMetricNames().contains(metricName)) {
-					timeDB.createFigure(metricName);
+				if (!timeDB.lookup(getMetricNames.class).f().contains(metricName)) {
+					timeDB.lookup(registerMetric.class).f(metricName);
 				}
 
 				buf.add(metricName, Date.time(), Utils.loadRatio());
 			}
 
-			timeDB.addPoints(buf);
+			timeDB.lookup(addPoints.class).f(buf);
 			buf.clear();
 		}
 	}
