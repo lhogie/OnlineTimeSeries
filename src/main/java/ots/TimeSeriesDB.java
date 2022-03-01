@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import idawi.Component;
-import idawi.TypedOperation;
+import idawi.TypedInnerOperation;
 import idawi.MessageQueue;
 import idawi.Service;
 import idawi.Streams;
@@ -57,7 +57,7 @@ public class TimeSeriesDB extends Service {
 		registerOperation(new store());
 	}
 
-	public class addPoint extends TypedOperation {
+	public class addPoint extends TypedInnerOperation {
 		public void f(String metric, double x, double y) {
 			Figure a = name2figure.get(metric);
 
@@ -73,7 +73,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class addPoints extends TypedOperation {
+	public class addPoints extends TypedInnerOperation {
 		public void f(PointBuffer buf) {
 
 			for (Figure f : buf.values()) {
@@ -97,7 +97,7 @@ public class TimeSeriesDB extends Service {
 		return "stores (name, x, y) triplets";
 	}
 
-	public class store extends TypedOperation {
+	public class store extends TypedInnerOperation {
 		public void f(String workbenchName) {
 			var file = new RegularFile(baseDir, workbenchName);
 			file.setContentAsJavaObject(name2figure);
@@ -109,7 +109,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class load extends TypedOperation {
+	public class load extends TypedInnerOperation {
 		public void f(String workbenchName) {
 			var file = new RegularFile(baseDir, workbenchName);
 			name2figure = (Map<String, Figure>) file.getContentAsJavaObject();
@@ -121,7 +121,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class removeMetric extends TypedOperation {
+	public class removeMetric extends TypedInnerOperation {
 		public void f(String figName) {
 			name2figure.remove(figName);
 		}
@@ -132,7 +132,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class getNbPoints extends TypedOperation {
+	public class getNbPoints extends TypedInnerOperation {
 		public int f(String figName) {
 			return name2figure.get(figName).getNbPoints();
 		}
@@ -143,7 +143,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class getMetricNames extends TypedOperation {
+	public class getMetricNames extends TypedInnerOperation {
 		public Set<String> f() {
 			return new HashSet<>(name2figure.keySet());
 		}
@@ -161,7 +161,7 @@ public class TimeSeriesDB extends Service {
 		double lastX, lastY;
 	}
 
-	public class getMetricInfo extends TypedOperation {
+	public class getMetricInfo extends TypedInnerOperation {
 		public Set<MetricInfo> f() {
 			var r = new HashSet<MetricInfo>();
 
@@ -184,7 +184,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class getWorkbenchList extends TypedOperation {
+	public class getWorkbenchList extends TypedInnerOperation {
 		public Set<String> f() {
 			return baseDir.listRegularFiles().stream().map(f -> f.getName()).collect(Collectors.toSet());
 		}
@@ -195,7 +195,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class retrieveAllPoints extends TypedOperation {
+	public class retrieveAllPoints extends TypedInnerOperation {
 		public Set<Figure> f(String re) {
 			Set<Figure> r = new HashSet<>();
 
@@ -214,7 +214,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class retrieveWorkbench extends TypedOperation {
+	public class retrieveWorkbench extends TypedInnerOperation {
 		public void f(MessageQueue in) throws Throwable {
 			PipedOutputStream pos = new PipedOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(pos);
@@ -228,7 +228,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class registerMetric extends TypedOperation {
+	public class registerMetric extends TypedInnerOperation {
 		synchronized public void f(String name) {
 			Figure f = new Figure();
 			f.setName(name);
@@ -242,7 +242,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class setMetricColor extends TypedOperation {
+	public class setMetricColor extends TypedInnerOperation {
 		synchronized public void f(String figName, Color color) {
 			name2figure.get(figName).setColor(color);
 		}
@@ -253,7 +253,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class filter extends TypedOperation {
+	public class filter extends TypedInnerOperation {
 		synchronized public Set<Figure> f(Filter filter) {
 			Set<Figure> r = new HashSet<>();
 
@@ -284,7 +284,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class getPlot extends TypedOperation {
+	public class getPlot extends TypedInnerOperation {
 		public byte[] f(Set<String> metricNames, String title, String format) {
 			Plot plot = new Plot();
 			metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
@@ -307,7 +307,7 @@ public class TimeSeriesDB extends Service {
 		String format;
 	}
 
-	public class getPlot_subscribe extends TypedOperation {
+	public class getPlot_subscribe extends TypedInnerOperation {
 		public void f(MessageQueue in) {
 			var msg = in.get_blocking();
 			var parms = (PSD) msg.content;
@@ -331,7 +331,7 @@ public class TimeSeriesDB extends Service {
 		}
 	}
 
-	public class getPlot_unsubscribe extends TypedOperation {
+	public class getPlot_unsubscribe extends TypedInnerOperation {
 		public void getPlot_unsubscribe(long id) {
 			subscriptions.remove(id);
 		}
