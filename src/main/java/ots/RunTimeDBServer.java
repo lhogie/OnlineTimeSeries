@@ -16,6 +16,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 import idawi.Component;
 import idawi.ComponentDescriptor;
+import idawi.net.LMI;
 import idawi.service.ServiceManager;
 import idawi.service.rest.RESTService;
 import ots.TimeSeriesDB.addPoint;
@@ -26,23 +27,29 @@ import toools.thread.Threads;
 public class RunTimeDBServer {
 	public static void main(String[] args) throws Throwable {
 		System.out.println("start");
-		var c = new Component();
+		var c = new Component("a");
+		var c2 = new Component("b");
+		LMI.connect(c, c2);
 		// starts the TimeSeriesDB service
-		c.lookupO(ServiceManager.start.class).f(TimeSeriesDB.class);
-		var tsd = c.lookup(TimeSeriesDB.class);
 
-		int port = 8084;
+		int port = 8081;
 
 		c.lookup(RESTService.class).startHTTPServer(port);
-		System.out.println("URL: http://localhost:" + port + "/api/" + c.name);
+		System.out.println("API: http://localhost:" + port + "/api/" + c.name);
+		System.out.println("Web: http://localhost:" + port + "/web/ots/display/index.html");
+		
 //			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
 
 		// creates the figure that will be fed
+		c.lookupO(ServiceManager.start.class).f(TimeSeriesDB.class);
+		var tsd = c.lookup(TimeSeriesDB.class);
 		tsd.lookup(registerMetric.class).f("testMetric");
 		// startGUI2(server, serverDescriptor);
 
+		
+		
 		var r = new Random();
-
+Threads.sleepForever();
 		// runs the simulation
 		for (double step = 0;; step += r.nextDouble()) {
 			// computes something
