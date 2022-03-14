@@ -18,7 +18,7 @@ import idawi.Component;
 import idawi.ComponentDescriptor;
 import idawi.net.LMI;
 import idawi.service.ServiceManager;
-import idawi.service.rest.RESTService;
+import idawi.service.rest.WebServer;
 import ots.TimeSeriesDB.addPoint;
 import ots.TimeSeriesDB.registerMetric;
 import toools.gui.Utilities;
@@ -34,7 +34,7 @@ public class RunTimeDBServer {
 
 		int port = 8081;
 
-		c.lookup(RESTService.class).startHTTPServer(port);
+		c.lookup(WebServer.class).startHTTPServer(port);
 		System.out.println("API: http://localhost:" + port + "/api/" + c.name);
 		System.out.println("Web: http://localhost:" + port + "/web/ots/display/index.html");
 		
