@@ -1,6 +1,5 @@
 package ots;
 
-import java.io.StringReader;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -8,11 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
-import org.apache.batik.swing.JSVGCanvas;
-import org.apache.batik.util.XMLResourceDescriptor;
-import org.w3c.dom.svg.SVGDocument;
 
 import idawi.Component;
 import idawi.ComponentDescriptor;
@@ -37,7 +31,7 @@ public class RunTimeDBServer {
 		c.lookup(WebServer.class).startHTTPServer(port);
 		System.out.println("API: http://localhost:" + port + "/api/" + c.name);
 		System.out.println("Web: http://localhost:" + port + "/web/ots/display/index.html");
-		
+
 //			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
 
 		// creates the figure that will be fed
@@ -46,10 +40,8 @@ public class RunTimeDBServer {
 		tsd.lookup(registerMetric.class).f("testMetric");
 		// startGUI2(server, serverDescriptor);
 
-		
-		
 		var r = new Random();
-Threads.sleepForever();
+		Threads.sleepForever();
 		// runs the simulation
 		for (double step = 0;; step += r.nextDouble()) {
 			// computes something
@@ -60,35 +52,6 @@ Threads.sleepForever();
 		}
 	}
 
-	private static void startGUI(TimeSeriesDBStub localDB, ComponentDescriptor remoteDB) {
-		String parser = XMLResourceDescriptor.getXMLParserClassName();
-		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(parser);
-		JSVGCanvas c = new JSVGCanvas();
-		JFrame frame = Utilities.displayInJFrame(c, "demo for Julien");
-		frame.setSize(800, 600);
-		long startDate = System.currentTimeMillis();
-		AtomicInteger i = new AtomicInteger();
-
-		Threads.newThread_loop(() -> {
-
-			try {
-				String svg = new String(localDB.getPlot(Set.of("some metric"), "my first plot", "svg"));
-				SVGDocument document = factory.createSVGDocument(null, new StringReader(svg));
-				c.setSVGDocument(document);
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-
-			double durationS = ((System.currentTimeMillis() - startDate) / 1000);
-
-			if (durationS > 0) {
-				double freq = i.get() / durationS;
-				System.out.println("updated " + freq + "frame/s");
-			}
-
-			i.incrementAndGet();
-		});
-	}
 
 	private static void startGUI2(TimeSeriesDBStub client, ComponentDescriptor server) {
 		JLabel c = new JLabel();
