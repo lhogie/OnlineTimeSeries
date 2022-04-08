@@ -2,16 +2,14 @@ package ots;
 
 import java.util.HashMap;
 
-import xycharter.Figure;
-
-public class PointBuffer extends HashMap<String, Figure> {
+public class PointBuffer extends HashMap<String, Metric> {
 	private int nbPoints = 0;
 
 	public void add(String metricName, double x, double y) {
-		Figure f = get(metricName);
+		var f = get(metricName);
 
 		if (f == null) {
-			put(metricName, f = new Figure());
+			put(metricName, f = new Metric());
 			f.setName(metricName);
 		}
 

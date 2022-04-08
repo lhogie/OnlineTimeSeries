@@ -1,15 +1,18 @@
 package ots;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
+import xycharter.Figure;
 
-public class Metric {
+public class Metric implements Serializable {
 	public String name;
 	public Unit unit;
-	DoubleList x = new DoubleArrayList(), y = new DoubleArrayList();
 	private Color color;
+
+	DoubleList x = new DoubleArrayList(), y = new DoubleArrayList();
 
 	public void setName(String metricName) {
 		this.name = metricName;
@@ -39,5 +42,17 @@ public class Metric {
 
 	public double x(int i) {
 		return this.x(i);
+	}
+	
+	 public Figure tofigure() {
+		var f = new Figure();
+
+		int sz = getNbPoints();
+
+		for (int i = 0; i < sz; ++i) {
+			f.addPoint(x(i), y(i));
+		}
+
+		return f;
 	}
 }

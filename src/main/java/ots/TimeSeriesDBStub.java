@@ -51,7 +51,7 @@ public class TimeSeriesDBStub extends ServiceStub {
 
 	public void setFigureColor(String metricName, Color c) throws Throwable {
 		localService.exec(to.o(TimeSeriesDB.setMetricColor.class), true, new OperationParameterList(metricName, c)).returnQ
-				.collect().throwAnyError();
+				.recv_sync().messages.throwAnyError();
 	}
 
 	public byte[] getPlot(Set<String> metricNames, String title, String format) throws Throwable {
@@ -60,7 +60,7 @@ public class TimeSeriesDBStub extends ServiceStub {
 
 	public byte[] getPlot_subscribe(Set<String> metricNames, String title, String format) throws Throwable {
 		return (byte[]) localService.exec(to.o( TimeSeriesDB.getPlot.class), true,
-				new OperationParameterList(metricNames, title, format)).returnQ.get();
+				new OperationParameterList(metricNames, title, format)).returnQ.collectOneResult();
 	}
 
 	public Set<String> metricNames() throws Throwable {

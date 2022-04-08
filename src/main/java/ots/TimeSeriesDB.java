@@ -13,10 +13,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import idawi.Component;
-import idawi.TypedInnerOperation;
 import idawi.MessageQueue;
 import idawi.Service;
 import idawi.Streams;
+import idawi.TypedInnerOperation;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import toools.io.file.Directory;
@@ -33,7 +33,7 @@ import xycharter.Plot;
 
 public class TimeSeriesDB extends Service {
 
-	private Map<String, Figure> name2figure = new HashMap<>();
+	private Map<String, Metric> name2figure = new HashMap<>();
 	private Directory baseDir = new Directory("$HOME/.timeSeriesDB");
 
 	public TimeSeriesDB(Component node) {
@@ -59,7 +59,7 @@ public class TimeSeriesDB extends Service {
 
 	public class addPoint extends TypedInnerOperation {
 		public void f(String metric, double x, double y) {
-			Figure a = name2figure.get(metric);
+			var a = name2figure.get(metric);
 
 			if (a == null)
 				throw new Error("figure not found: " + metric);
@@ -76,8 +76,8 @@ public class TimeSeriesDB extends Service {
 	public class addPoints extends TypedInnerOperation {
 		public void f(PointBuffer buf) {
 
-			for (Figure f : buf.values()) {
-				Figure a = name2figure.get(f.name);
+			for (var f : buf.values()) {
+				var a = name2figure.get(f.name);
 
 				if (a == null)
 					throw new Error("figure not found: " + f.name);
@@ -112,7 +112,7 @@ public class TimeSeriesDB extends Service {
 	public class load extends TypedInnerOperation {
 		public void f(String workbenchName) {
 			var file = new RegularFile(baseDir, workbenchName);
-			name2figure = (Map<String, Figure>) file.getContentAsJavaObject();
+			name2figure = (Map<String, Metric>) file.getContentAsJavaObject();
 		}
 
 		@Override
@@ -196,16 +196,8 @@ public class TimeSeriesDB extends Service {
 	}
 
 	public class retrieveAllPoints extends TypedInnerOperation {
-		public Set<Figure> f(String re) {
-			Set<Figure> r = new HashSet<>();
-
-			for (var e : name2figure.entrySet()) {
-				if (e.getKey().matches(re)) {
-					r.add(e.getValue());
-				}
-			}
-
-			return r;
+		public Metric f(String metricName) {
+			return name2figure.get(metricName);
 		}
 
 		@Override
@@ -219,7 +211,7 @@ public class TimeSeriesDB extends Service {
 			PipedOutputStream pos = new PipedOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(pos);
 			oos.writeObject(name2figure);
-			Streams.split(new PipedInputStream(pos), 1000, b -> send(b, in.get_blocking().replyTo));
+			Streams.split(new PipedInputStream(pos), 1000, b -> send(b, in.poll_sync().replyTo));
 		}
 
 		@Override
@@ -230,7 +222,7 @@ public class TimeSeriesDB extends Service {
 
 	public class registerMetric extends TypedInnerOperation {
 		synchronized public void f(String name) {
-			Figure f = new Figure();
+			var f = new Metric();
 			f.setName(name);
 			// f.addRenderer(new ConnectedLineFigureRenderer());
 			name2figure.put(name, f);
@@ -254,10 +246,10 @@ public class TimeSeriesDB extends Service {
 	}
 
 	public class filter extends TypedInnerOperation {
-		synchronized public Set<Figure> f(Filter filter) {
-			Set<Figure> r = new HashSet<>();
+		synchronized public Set<Metric> f(Filter filter) {
+			Set<Metric> r = new HashSet<>();
 
-			for (Figure f : name2figure.values()) {
+			for (var f : name2figure.values()) {
 				if (filter.fp.accept(f.name)) {
 					Figure subFigure = new Figure();
 					subFigure.name = f.name;
@@ -287,7 +279,7 @@ public class TimeSeriesDB extends Service {
 	public class getPlot extends TypedInnerOperation {
 		public byte[] f(Set<String> metricNames, String title, String format) {
 			Plot plot = new Plot();
-			metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
+			metricNames.forEach(n -> plot.addFigure(name2figure.get(n).tofigure()));
 			plot.getSpace().getLegend().setText(title);
 			byte[] rawData = getPlotRawData(plot, format);
 			return rawData;
@@ -309,11 +301,11 @@ public class TimeSeriesDB extends Service {
 
 	public class getPlot_subscribe extends TypedInnerOperation {
 		public void f(MessageQueue in) {
-			var msg = in.get_blocking();
+			var msg = in.poll_sync();
 			var parms = (PSD) msg.content;
 
 			Plot plot = new Plot();
-			parms.metricNames.forEach(n -> plot.addFigure(name2figure.get(n)));
+			parms.metricNames.forEach(n -> plot.addFigure(name2figure.get(n).tofigure()));
 			plot.getSpace().getLegend().setText(parms.title);
 			long id = ThreadLocalRandom.current().nextLong();
 			subscriptions.add(id);

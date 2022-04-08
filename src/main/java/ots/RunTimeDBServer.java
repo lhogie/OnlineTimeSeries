@@ -35,13 +35,12 @@ public class RunTimeDBServer {
 //			System.out.println("Website URL: http://localhost:" + port + "/web/og/display/ls.html");
 
 		// creates the figure that will be fed
-		c.lookupO(ServiceManager.start.class).f(TimeSeriesDB.class);
+		c.operation(ServiceManager.start.class).f(TimeSeriesDB.class);
 		var tsd = c.lookup(TimeSeriesDB.class);
 		tsd.lookup(registerMetric.class).f("testMetric");
 		// startGUI2(server, serverDescriptor);
 
 		var r = new Random();
-		Threads.sleepForever();
 		// runs the simulation
 		for (double step = 0;; step += r.nextDouble()) {
 			// computes something
